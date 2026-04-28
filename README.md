@@ -10,7 +10,6 @@ A JavaScript library for the [Tiller](https://gettiller.com) time tracker — co
 
 - A browser with [WebHID](https://caniuse.com/webhid) support (Chrome, Edge)
 - A Tiller device
-  <img src="/public/tiller-device-silver.png" width="200" height="auto">
   ![Photo of Tiller device](/public/tiller-device-silver.png)
 
 ## Installation
