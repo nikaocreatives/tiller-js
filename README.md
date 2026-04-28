@@ -22,11 +22,11 @@ import { Tiller } from './src/index.js';
 
 ## Demos
 
-|     | Demo                                          | Description                                               |
-| --- | --------------------------------------------- | --------------------------------------------------------- |
-| ⏱   | [Stopwatch](docs/demo/stopwatch.html)         | Tap to start/stop, double tap to lap, long press to reset |
-| 🎨  | [Color Mixer](docs/demo/color-mixer.html)     | Scroll through hues, LED matches live, tap to save colors |
-| ⚡  | [Reaction Game](docs/demo/reaction-game.html) | React to the LED color as fast as possible                |
+|     | Demo                                     | Description                                               |
+| --- | ---------------------------------------- | --------------------------------------------------------- |
+| ⏱   | [Stopwatch](demo/stopwatch.html)         | Tap to start/stop, double tap to lap, long press to reset |
+| 🎨  | [Color Mixer](demo/color-mixer.html)     | Scroll through hues, LED matches live, tap to save colors |
+| ⚡  | [Reaction Game](demo/reaction-game.html) | React to the LED color as fast as possible                |
 
 ## Quick Start
 
