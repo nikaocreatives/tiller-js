@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Color Mixer — Tiller Demo</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+			body {
+				background: hsl(0, 40%, 35%);
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				transition: background 0.1s;
+			}
+
+			nav {
+				display: flex;
+				gap: 24px;
+				padding: 16px 24px;
+				font-size: 0.875rem;
+				background: rgba(0,0,0,0.2);
+				backdrop-filter: blur(8px);
+				position: relative;
+				z-index: 10;
+			}
+
+			nav a { color: rgba(255,255,255,0.6); text-decoration: none; }
+			nav a:hover { color: #fff; }
+			nav a.active { color: #fff; font-weight: 600; }
+
+			main {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 40px;
+				padding: 32px;
+				position: relative;
+			}
+
+			#connect-screen { text-align: center; }
+
+			button {
+				background: rgba(255,255,255,0.15);
+				color: #fff;
+				border: 1px solid rgba(255,255,255,0.3);
+				padding: 12px 28px;
+				border-radius: 8px;
+				font-size: 0.95rem;
+				font-weight: 600;
+				cursor: pointer;
+				backdrop-filter: blur(8px);
+			}
+
+			button:hover { background: rgba(255,255,255,0.25); }
+
+			#mixer-screen { display: none; flex-direction: column; align-items: center; gap: 40px; width: 100%; }
+
+			.color-display {
+				width: clamp(180px, 40vw, 280px);
+				height: clamp(180px, 40vw, 280px);
+				border-radius: 50%;
+				box-shadow: 0 0 80px rgba(0,0,0,0.3);
+				transition: background 0.1s;
+				border: 3px solid rgba(255,255,255,0.2);
+			}
+
+			.color-info {
+				text-align: center;
+				color: #fff;
+				text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+			}
+
+			.hex {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: clamp(1.5rem, 5vw, 2.5rem);
+				font-weight: 300;
+				letter-spacing: 2px;
+			}
+
+			.rgb {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 0.9rem;
+				opacity: 0.7;
+				margin-top: 6px;
+			}
+
+			.hue-bar-wrap {
+				width: 100%;
+				max-width: 400px;
+			}
+
+			.hue-bar {
+				width: 100%;
+				height: 10px;
+				border-radius: 5px;
+				background: linear-gradient(to right,
+					hsl(0,100%,50%), hsl(30,100%,50%), hsl(60,100%,50%),
+					hsl(90,100%,50%), hsl(120,100%,50%), hsl(150,100%,50%),
+					hsl(180,100%,50%), hsl(210,100%,50%), hsl(240,100%,50%),
+					hsl(270,100%,50%), hsl(300,100%,50%), hsl(330,100%,50%),
+					hsl(360,100%,50%)
+				);
+				position: relative;
+			}
+
+			.hue-thumb {
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: #fff;
+				border: 2px solid rgba(0,0,0,0.3);
+				box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+				position: absolute;
+				top: 50%;
+				transform: translate(-50%, -50%);
+				transition: left 0.05s;
+			}
+
+			.palette {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				justify-content: center;
+				max-width: 400px;
+				min-height: 44px;
+			}
+
+			.swatch {
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 2px solid rgba(255,255,255,0.3);
+				cursor: default;
+				box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+				animation: popin 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+			}
+
+			@keyframes popin {
+				from { transform: scale(0); opacity: 0; }
+				to { transform: scale(1); opacity: 1; }
+			}
+
+			.hints {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				justify-content: center;
+				font-size: 0.8rem;
+				color: rgba(255,255,255,0.4);
+			}
+
+			.hint { display: flex; gap: 6px; align-items: center; }
+			.hint-key {
+				background: rgba(255,255,255,0.1);
+				border: 1px solid rgba(255,255,255,0.2);
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 0.75rem;
+				color: rgba(255,255,255,0.5);
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<a href="../docs/index.html">← Docs</a>
+			<a href="stopwatch.html">Stopwatch</a>
+			<a href="color-mixer.html" class="active">Color Mixer</a>
+			<a href="reaction-game.html">Reaction Game</a>
+		</nav>
+
+		<main>
+			<div id="connect-screen">
+				<button id="connect-btn">Connect Tiller</button>
+			</div>
+
+			<div id="mixer-screen">
+				<div class="color-display" id="color-display"></div>
+
+				<div class="color-info">
+					<div class="hex" id="hex">#FF0000</div>
+					<div class="rgb" id="rgb">rgb(255, 0, 0)</div>
+				</div>
+
+				<div class="hue-bar-wrap">
+					<div class="hue-bar">
+						<div class="hue-thumb" id="hue-thumb"></div>
+					</div>
+				</div>
+
+				<div class="palette" id="palette"></div>
+
+				<div class="hints">
+					<div class="hint"><span class="hint-key">scroll</span> change hue</div>
+					<div class="hint"><span class="hint-key">tap</span> save color</div>
+<div class="hint"><span class="hint-key">long press</span> clear palette</div>
+				</div>
+			</div>
+		</main>
+
+		<script type="module">
+			import { Tiller } from '../src/index.js';
+
+			const tiller = new Tiller({ scrollSensitivity: 2 });
+
+			let hue = 0;
+			let savedColors = [];
+			let ledThrottle = null;
+
+			const hslToRgb = (h) => {
+				const s = 1, l = 0.5;
+				const c = (1 - Math.abs(2 * l - 1)) * s;
+				const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+				const m = l - c / 2;
+				let r = 0, g = 0, b = 0;
+				if (h < 60)       { r = c; g = x; }
+				else if (h < 120) { r = x; g = c; }
+				else if (h < 180) { g = c; b = x; }
+				else if (h < 240) { g = x; b = c; }
+				else if (h < 300) { r = x; b = c; }
+				else              { r = c; b = x; }
+				return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+			};
+
+			const toHex = (r, g, b) =>
+				'#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0').toUpperCase()).join('');
+
+			const updateLed = (r, g, b) => {
+				clearTimeout(ledThrottle);
+				ledThrottle = setTimeout(() => tiller.setLedColor(r, g, b), 40);
+			};
+
+			const update = () => {
+				const [r, g, b] = hslToRgb(hue);
+				const hex = toHex(r, g, b);
+
+				document.body.style.background = `hsl(${hue}, 40%, 35%)`;
+				document.getElementById('color-display').style.background = `hsl(${hue}, 100%, 50%)`;
+				document.getElementById('hex').textContent = hex;
+				document.getElementById('rgb').textContent = `rgb(${r}, ${g}, ${b})`;
+				document.getElementById('hue-thumb').style.left = `${(hue / 360) * 100}%`;
+
+				updateLed(r, g, b);
+			};
+
+			const renderPalette = () => {
+				document.getElementById('palette').innerHTML = savedColors
+					.map(([r, g, b]) => `<div class="swatch" style="background:rgb(${r},${g},${b})" title="${toHex(r,g,b)}"></div>`)
+					.join('');
+			};
+
+			tiller
+				.on('scroll', (delta) => {
+					hue = Math.min(360, Math.max(0, hue + delta));
+					update();
+				})
+				.on('tap', () => {
+					const [r, g, b] = hslToRgb(hue);
+					savedColors.push([r, g, b]);
+					renderPalette();
+				})
+				.on('longpress', () => {
+					savedColors = [];
+					renderPalette();
+				});
+
+			document.getElementById('connect-btn').onclick = async () => {
+				await tiller.connect();
+				document.getElementById('connect-screen').style.display = 'none';
+				document.getElementById('mixer-screen').style.display = 'flex';
+				update();
+			};
+		</script>
+	</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "tiller-js",
+  "version": "0.1.0",
+  "description": "JavaScript library for the Tiller time tracker — gestures and LED control via WebHID",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "keywords": [
+    "tiller",
+    "webhid",
+    "hid",
+    "input-device",
+    "led",
+    "gesture"
+  ],
+  "author": "Chas Turansky",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chasturansky/tiller-js.git"
+  },
+  "homepage": "https://github.com/chasturansky/tiller-js#readme",
+  "bugs": {
+    "url": "https://github.com/chasturansky/tiller-js/issues"
+  }
+}

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tiller.js</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; }
+
+			:root {
+				--bg: #fff;
+				--fg: #111;
+				--muted: #555;
+				--border: #e0e0e0;
+				--accent: #e8431a;
+				--code-bg: #f5f5f5;
+				--code-fg: #c0392b;
+				--table-head: #fafafa;
+				font-size: 16px;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--fg);
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+				line-height: 1.6;
+			}
+
+			a { color: var(--accent); text-decoration: none; }
+			a:hover { text-decoration: underline; }
+
+			header {
+				border-bottom: 1px solid var(--border);
+				padding: 48px 0 40px;
+				text-align: center;
+			}
+
+			header h1 {
+				margin: 0 0 8px;
+				font-size: 2.25rem;
+				letter-spacing: -0.5px;
+			}
+
+			header p {
+				margin: 0 0 24px;
+				color: var(--muted);
+				font-size: 1.05rem;
+			}
+
+			header a.cta {
+				display: inline-block;
+				background: var(--accent);
+				color: #fff;
+				padding: 10px 24px;
+				border-radius: 6px;
+				font-weight: 600;
+				font-size: 0.95rem;
+			}
+
+			header a.cta:hover { text-decoration: none; opacity: 0.9; }
+
+			main {
+				max-width: 760px;
+				margin: 0 auto;
+				padding: 48px 24px 96px;
+			}
+
+			h2 {
+				margin: 48px 0 12px;
+				font-size: 1.35rem;
+				border-bottom: 1px solid var(--border);
+				padding-bottom: 8px;
+			}
+
+			h3 {
+				margin: 28px 0 8px;
+				font-size: 1rem;
+				color: var(--muted);
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				font-weight: 600;
+			}
+
+			p { margin: 0 0 16px; }
+
+			code {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 0.875em;
+				background: var(--code-bg);
+				color: var(--code-fg);
+				padding: 1px 5px;
+				border-radius: 3px;
+			}
+
+			pre {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				padding: 20px;
+				overflow-x: auto;
+				margin: 0 0 24px;
+			}
+
+			pre code {
+				background: none;
+				color: var(--fg);
+				padding: 0;
+				font-size: 0.875rem;
+				line-height: 1.7;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 0 0 24px;
+				font-size: 0.9rem;
+			}
+
+			thead tr { background: var(--table-head); }
+
+			th, td {
+				text-align: left;
+				padding: 10px 14px;
+				border: 1px solid var(--border);
+			}
+
+			th { font-weight: 600; }
+
+			.note {
+				background: #fff8f6;
+				border-left: 3px solid var(--accent);
+				padding: 12px 16px;
+				border-radius: 0 6px 6px 0;
+				margin: 0 0 24px;
+				font-size: 0.9rem;
+				color: var(--muted);
+			}
+
+			.note strong { color: var(--fg); }
+
+			.badge {
+				display: inline-block;
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-size: 0.8rem;
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				margin-right: 4px;
+			}
+
+			.demo-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 16px;
+				margin: 0 0 24px;
+			}
+
+			.demo-card {
+				display: block;
+				padding: 20px;
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				text-decoration: none;
+				color: var(--fg);
+				transition: border-color 0.15s, box-shadow 0.15s;
+			}
+
+			.demo-card:hover {
+				border-color: var(--accent);
+				box-shadow: 0 2px 12px rgba(232,67,26,0.08);
+				text-decoration: none;
+			}
+
+			.demo-card-icon {
+				font-size: 1.75rem;
+				margin-bottom: 10px;
+			}
+
+			.demo-card-title {
+				font-weight: 600;
+				font-size: 0.95rem;
+				margin-bottom: 4px;
+			}
+
+			.demo-card-desc {
+				font-size: 0.825rem;
+				color: var(--muted);
+				line-height: 1.5;
+			}
+
+			footer {
+				text-align: center;
+				padding: 32px;
+				border-top: 1px solid var(--border);
+				color: var(--muted);
+				font-size: 0.875rem;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Tiller.js</h1>
+			<p>A JavaScript library for the <a href="https://gettiller.com" target="_blank">Tiller</a> device — gestures and LED control for the web.</p>
+			<a class="cta" href="https://github.com/chasturansky/tiller-js" target="_blank">View on GitHub</a>
+		</header>
+
+		<main>
+			<h2>Requirements</h2>
+			<p>
+				A browser with <a href="https://caniuse.com/webhid" target="_blank">WebHID</a> support
+				<span class="badge">Chrome</span><span class="badge">Edge</span>
+				and a Tiller device.
+			</p>
+
+			<h2>Installation</h2>
+			<p>No build step required. Import directly as an ES module:</p>
+			<pre><code>import { Tiller } from './src/index.js';</code></pre>
+
+			<h2>Quick Start</h2>
+			<pre><code>const tiller = new Tiller();
+await tiller.connect();
+
+tiller
+  .on('tap', () => tiller.toggleLed())
+  .on('scroll', (delta) => window.scrollBy(0, delta));</code></pre>
+			<p><code>connect()</code> uses a previously paired device if one exists, or prompts the user to select one.</p>
+
+			<h2>Demos</h2>
+			<div class="demo-grid">
+				<a class="demo-card" href="../demo/stopwatch.html">
+					<div class="demo-card-icon">⏱</div>
+					<div class="demo-card-title">Stopwatch</div>
+					<div class="demo-card-desc">Tap to start/stop, double tap to lap, long press to reset. LED reflects running state.</div>
+				</a>
+				<a class="demo-card" href="../demo/color-mixer.html">
+					<div class="demo-card-icon">🎨</div>
+					<div class="demo-card-title">Color Mixer</div>
+					<div class="demo-card-desc">Scroll to sweep through hues. LED matches live. Tap to save colors to a palette.</div>
+				</a>
+				<a class="demo-card" href="../demo/reaction-game.html">
+					<div class="demo-card-icon">⚡</div>
+					<div class="demo-card-title">Reaction Game</div>
+					<div class="demo-card-desc">Double tap to start. React to the LED color as fast as possible. Track your best times.</div>
+				</a>
+			</div>
+
+			<h2>Constructor Options</h2>
+			<pre><code>const tiller = new Tiller({
+  scrollSensitivity: 1,    // multiplier applied to scroll delta (default: 1)
+  doubleTapThreshold: 300, // ms between taps to count as double tap (default: 300)
+  longPressThreshold: 500, // ms held down to trigger long press (default: 500)
+});</code></pre>
+
+			<h2>Events</h2>
+			<p>All events are registered with <code>.on(event, handler)</code>, which returns the instance for chaining.</p>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Event</th>
+						<th>Handler</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>tap</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device tapped once</td>
+					</tr>
+					<tr>
+						<td><code>doubletap</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device tapped twice in quick succession</td>
+					</tr>
+					<tr>
+						<td><code>longpress</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device held down past the long press threshold</td>
+					</tr>
+					<tr>
+						<td><code>press</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device pressed down (raw)</td>
+					</tr>
+					<tr>
+						<td><code>release</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device released (raw)</td>
+					</tr>
+					<tr>
+						<td><code>scroll</code></td>
+						<td><code>(delta: number) =&gt; void</code></td>
+						<td>Device rotated — delta is positive or negative</td>
+					</tr>
+					<tr>
+						<td><code>connect</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device connected or reconnected</td>
+					</tr>
+					<tr>
+						<td><code>disconnect</code></td>
+						<td><code>() =&gt; void</code></td>
+						<td>Device disconnected</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="note">
+				<strong>Tap vs double tap:</strong> A double tap suppresses the two individual tap events — only <code>doubletap</code> fires.<br><br>
+				<strong>Long press vs tap:</strong> Releasing after a long press only fires <code>release</code> — <code>tap</code> is suppressed.
+			</div>
+
+			<h2>LED Control</h2>
+			<pre><code>// Set color (r, g, b — each 0–255) and immediately turn the LED on
+await tiller.setLedColor(255, 0, 0); // red
+await tiller.setLedColor(0, 255, 0); // green
+await tiller.setLedColor(0, 0, 255); // blue
+
+// Turn on with the last set color
+await tiller.setLedOn();
+
+// Turn off
+await tiller.setLedOff();
+
+// Toggle
+await tiller.toggleLed();</code></pre>
+
+			<h2>Getters</h2>
+			<pre><code>tiller.isConnected // boolean — whether a device is currently connected
+tiller.ledOn       // boolean — current LED state
+tiller.ledColor    // { r, g, b } — last set color</code></pre>
+
+			<h2>Full Example</h2>
+			<pre><code>import { Tiller } from './src/index.js';
+
+const tiller = new Tiller({ scrollSensitivity: 10 });
+await tiller.connect();
+
+tiller
+  .on('connect', () => console.log('Tiller connected'))
+  .on('disconnect', () => console.log('Tiller disconnected'))
+  .on('tap', () => tiller.toggleLed())
+  .on('doubletap', () => tiller.setLedColor(255, 0, 0))
+  .on('longpress', () => tiller.setLedColor(0, 0, 255))
+  .on('scroll', (delta) => window.scrollBy(0, delta));</code></pre>
+		</main>
+
+		<footer>
+			Tiller.js — built for the <a href="https://gettiller.com" target="_blank">Tiller</a> device
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Stopwatch — Tiller Demo</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+			body {
+				background: #111;
+				color: #fff;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			nav {
+				display: flex;
+				gap: 24px;
+				padding: 16px 24px;
+				border-bottom: 1px solid #222;
+				font-size: 0.875rem;
+			}
+
+			nav a { color: #888; text-decoration: none; }
+			nav a:hover { color: #fff; }
+			nav a.active { color: #fff; font-weight: 600; }
+
+			main {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 48px;
+				padding: 32px;
+			}
+
+			#connect-screen { text-align: center; }
+
+			button {
+				background: #fff;
+				color: #111;
+				border: none;
+				padding: 12px 28px;
+				border-radius: 8px;
+				font-size: 0.95rem;
+				font-weight: 600;
+				cursor: pointer;
+			}
+
+			button:hover { opacity: 0.85; }
+
+			#timer-screen { display: none; flex-direction: column; align-items: center; gap: 48px; width: 100%; }
+
+			.status {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: 0.875rem;
+				color: #888;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.led-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: #333;
+				transition: background 0.2s;
+			}
+
+			.led-dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+			.led-dot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+			.led-dot.white { background: #fff; box-shadow: 0 0 8px #fff; }
+
+			#time {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: clamp(3rem, 12vw, 6rem);
+				font-weight: 300;
+				letter-spacing: -2px;
+				line-height: 1;
+				color: #fff;
+			}
+
+			#lap-time {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 1.25rem;
+				color: #555;
+				letter-spacing: -0.5px;
+			}
+
+			#laps {
+				width: 100%;
+				max-width: 400px;
+				max-height: 240px;
+				overflow-y: auto;
+			}
+
+			.lap-row {
+				display: flex;
+				justify-content: space-between;
+				padding: 10px 0;
+				border-bottom: 1px solid #1e1e1e;
+				font-size: 0.9rem;
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				animation: fadein 0.2s ease;
+			}
+
+			.lap-row:first-child { border-top: 1px solid #1e1e1e; }
+			.lap-row .lap-label { color: #555; }
+			.lap-row .lap-value { color: #fff; }
+			.lap-row.fastest .lap-value { color: #22c55e; }
+			.lap-row.slowest .lap-value { color: #ef4444; }
+
+			@keyframes fadein { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; } }
+
+			.hints {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				justify-content: center;
+				font-size: 0.8rem;
+				color: #444;
+			}
+
+			.hint { display: flex; gap: 6px; align-items: center; }
+			.hint-key {
+				background: #1e1e1e;
+				border: 1px solid #333;
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 0.75rem;
+				color: #666;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<a href="../docs/index.html">← Docs</a>
+			<a href="stopwatch.html" class="active">Stopwatch</a>
+			<a href="color-mixer.html">Color Mixer</a>
+			<a href="reaction-game.html">Reaction Game</a>
+		</nav>
+
+		<main>
+			<div id="connect-screen">
+				<button id="connect-btn">Connect Tiller</button>
+			</div>
+
+			<div id="timer-screen">
+				<div class="status">
+					<div class="led-dot" id="led-dot"></div>
+					<span id="status-text">ready</span>
+				</div>
+
+				<div>
+					<div id="time">00:00.00</div>
+					<div id="lap-time" style="text-align:center; margin-top: 8px;">lap —</div>
+				</div>
+
+				<div id="laps"></div>
+
+				<div class="hints">
+					<div class="hint"><span class="hint-key">tap</span> start / stop</div>
+					<div class="hint"><span class="hint-key">double tap</span> lap</div>
+					<div class="hint"><span class="hint-key">long press</span> reset</div>
+				</div>
+			</div>
+		</main>
+
+		<script type="module">
+			import { Tiller } from '../src/index.js';
+
+			const tiller = new Tiller();
+
+			const connectScreen = document.getElementById('connect-screen');
+			const timerScreen = document.getElementById('timer-screen');
+			const timeEl = document.getElementById('time');
+			const lapTimeEl = document.getElementById('lap-time');
+			const lapsEl = document.getElementById('laps');
+			const ledDot = document.getElementById('led-dot');
+			const statusText = document.getElementById('status-text');
+
+			let running = false;
+			let startTime = null;
+			let elapsed = 0;
+			let lapStart = 0;
+			let laps = [];
+			let rafId = null;
+
+			const fmt = (ms) => {
+				const cs = Math.floor(ms / 10) % 100;
+				const s = Math.floor(ms / 1000) % 60;
+				const m = Math.floor(ms / 60000);
+				return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+			};
+
+			const tick = () => {
+				if (!running) return;
+				const now = Date.now();
+				elapsed = now - startTime;
+				timeEl.textContent = fmt(elapsed);
+				lapTimeEl.textContent = `lap ${fmt(now - lapStart)}`;
+				rafId = requestAnimationFrame(tick);
+			};
+
+			const setLed = (state) => {
+				ledDot.className = 'led-dot' + (state ? ` ${state}` : '');
+			};
+
+			const setStatus = (text, led) => {
+				statusText.textContent = text;
+				setLed(led);
+			};
+
+			const renderLaps = () => {
+				if (laps.length === 0) return;
+				const times = laps.map((l) => l.duration);
+				const min = Math.min(...times);
+				const max = Math.max(...times);
+
+				lapsEl.innerHTML = laps
+					.slice()
+					.reverse()
+					.map((lap) => {
+						const cls = laps.length > 1
+							? lap.duration === min ? ' fastest'
+							: lap.duration === max ? ' slowest' : ''
+							: '';
+						return `<div class="lap-row${cls}">
+							<span class="lap-label">Lap ${lap.number}</span>
+							<span class="lap-value">${fmt(lap.duration)}</span>
+						</div>`;
+					})
+					.join('');
+			};
+
+			tiller
+				.on('tap', () => {
+					if (running) {
+						running = false;
+						cancelAnimationFrame(rafId);
+						elapsed = Date.now() - startTime;
+						timeEl.textContent = fmt(elapsed);
+						lapTimeEl.textContent = `lap ${fmt(Date.now() - lapStart)}`;
+						setStatus('stopped', 'red');
+						tiller.setLedColor(255, 0, 0);
+					} else {
+						startTime = Date.now() - elapsed;
+						if (lapStart === 0) lapStart = Date.now();
+						running = true;
+						rafId = requestAnimationFrame(tick);
+						setStatus('running', 'green');
+						tiller.setLedColor(0, 255, 0);
+					}
+				})
+				.on('doubletap', () => {
+					if (!running && elapsed === 0) return;
+					const now = Date.now();
+					const lapDuration = now - lapStart;
+					laps.push({ number: laps.length + 1, duration: lapDuration });
+					lapStart = now;
+					renderLaps();
+					// brief white flash then back to green
+					tiller.setLedColor(255, 255, 255);
+					setTimeout(() => {
+						if (running) tiller.setLedColor(0, 255, 0);
+					}, 200);
+					setLed('white');
+					setTimeout(() => setLed(running ? 'green' : 'red'), 200);
+				})
+				.on('longpress', () => {
+					running = false;
+					cancelAnimationFrame(rafId);
+					elapsed = 0;
+					lapStart = 0;
+					laps = [];
+					timeEl.textContent = '00:00.00';
+					lapTimeEl.textContent = 'lap —';
+					lapsEl.innerHTML = '';
+					setStatus('ready', null);
+					tiller.setLedOff();
+				});
+
+			document.getElementById('connect-btn').onclick = async () => {
+				await tiller.connect();
+				connectScreen.style.display = 'none';
+				timerScreen.style.display = 'flex';
+			};
+		</script>
+	</body>
+</html>

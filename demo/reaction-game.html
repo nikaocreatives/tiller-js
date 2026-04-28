@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Reaction Game — Tiller Demo</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+			body {
+				background: #111;
+				color: #fff;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			nav {
+				display: flex;
+				gap: 24px;
+				padding: 16px 24px;
+				border-bottom: 1px solid #222;
+				font-size: 0.875rem;
+			}
+
+			nav a { color: #888; text-decoration: none; }
+			nav a:hover { color: #fff; }
+			nav a.active { color: #fff; font-weight: 600; }
+
+			main {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 40px;
+				padding: 32px;
+			}
+
+			#connect-screen { text-align: center; }
+
+			button {
+				background: #fff;
+				color: #111;
+				border: none;
+				padding: 12px 28px;
+				border-radius: 8px;
+				font-size: 0.95rem;
+				font-weight: 600;
+				cursor: pointer;
+			}
+
+			button:hover { opacity: 0.85; }
+
+			#game-screen { display: none; flex-direction: column; align-items: center; gap: 40px; width: 100%; }
+
+			.circle {
+				width: clamp(160px, 35vw, 260px);
+				height: clamp(160px, 35vw, 260px);
+				border-radius: 50%;
+				background: #1e1e1e;
+				border: 3px solid #2a2a2a;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background 0.1s, box-shadow 0.1s;
+				position: relative;
+			}
+
+			.circle.active {
+				animation: pulse 0.6s ease-out;
+			}
+
+			@keyframes pulse {
+				0% { transform: scale(0.92); }
+				60% { transform: scale(1.04); }
+				100% { transform: scale(1); }
+			}
+
+			.circle-label {
+				font-size: 1rem;
+				color: #444;
+				text-align: center;
+				line-height: 1.5;
+				padding: 16px;
+			}
+
+			#state-text {
+				font-size: 1.1rem;
+				color: #555;
+				text-align: center;
+				min-height: 1.5em;
+			}
+
+			#result {
+				text-align: center;
+				min-height: 64px;
+			}
+
+			#reaction-time {
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: clamp(2rem, 8vw, 3.5rem);
+				font-weight: 300;
+				color: #fff;
+				letter-spacing: -1px;
+			}
+
+			#reaction-label {
+				font-size: 0.8rem;
+				color: #555;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				margin-top: 4px;
+			}
+
+			.history {
+				display: flex;
+				gap: 8px;
+				align-items: flex-end;
+				height: 60px;
+			}
+
+			.history-bar {
+				width: 28px;
+				border-radius: 4px 4px 0 0;
+				background: #2a2a2a;
+				transition: height 0.3s ease, background 0.3s;
+				min-height: 4px;
+			}
+
+			.false-start {
+				display: none;
+				position: fixed;
+				inset: 0;
+				background: rgba(239,68,68,0.15);
+				align-items: center;
+				justify-content: center;
+				font-size: 1.5rem;
+				color: #ef4444;
+				font-weight: 600;
+				pointer-events: none;
+			}
+
+			.false-start.show { display: flex; }
+
+			.hints {
+				display: flex;
+				gap: 24px;
+				flex-wrap: wrap;
+				justify-content: center;
+				font-size: 0.8rem;
+				color: #444;
+			}
+
+			.hint { display: flex; gap: 6px; align-items: center; }
+			.hint-key {
+				background: #1e1e1e;
+				border: 1px solid #333;
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-size: 0.75rem;
+				color: #666;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<a href="../docs/index.html">← Docs</a>
+			<a href="stopwatch.html">Stopwatch</a>
+			<a href="color-mixer.html">Color Mixer</a>
+			<a href="reaction-game.html" class="active">Reaction Game</a>
+		</nav>
+
+		<main>
+			<div id="connect-screen">
+				<button id="connect-btn">Connect Tiller</button>
+			</div>
+
+			<div id="game-screen">
+				<div class="circle" id="circle">
+					<div class="circle-label" id="circle-label">double tap<br>to start</div>
+				</div>
+
+				<div id="state-text"></div>
+
+				<div id="result">
+					<div id="reaction-time"></div>
+					<div id="reaction-label"></div>
+				</div>
+
+				<div class="history" id="history"></div>
+
+				<div class="hints">
+					<div class="hint"><span class="hint-key">double tap</span> start round</div>
+					<div class="hint"><span class="hint-key">tap</span> react!</div>
+					<div class="hint"><span class="hint-key">long press</span> reset scores</div>
+				</div>
+			</div>
+		</main>
+
+		<div class="false-start" id="false-start">Too early!</div>
+
+		<script type="module">
+			import { Tiller } from '../src/index.js';
+
+			const tiller = new Tiller();
+
+			const COLORS = [
+				{ name: 'Red',    r: 255, g: 0,   b: 0,   hex: '#ff0000' },
+				{ name: 'Green',  r: 0,   g: 255, b: 0,   hex: '#00ff00' },
+				{ name: 'Blue',   r: 0,   g: 0,   b: 255, hex: '#0000ff' },
+				{ name: 'Yellow', r: 255, g: 255, b: 0,   hex: '#ffff00' },
+				{ name: 'White',  r: 255, g: 255, b: 255, hex: '#ffffff' },
+			];
+
+			const circle = document.getElementById('circle');
+			const circleLabel = document.getElementById('circle-label');
+			const stateText = document.getElementById('state-text');
+			const reactionTimeEl = document.getElementById('reaction-time');
+			const reactionLabelEl = document.getElementById('reaction-label');
+			const historyEl = document.getElementById('history');
+			const falseStartEl = document.getElementById('false-start');
+
+			// idle | countdown | active | result
+			let phase = 'idle';
+			let showTime = null;
+			let countdownTimer = null;
+			let results = [];
+			let currentColor = null;
+
+			const rating = (ms) => {
+				if (ms < 180) return { label: 'Superhuman', color: '#a855f7' };
+				if (ms < 250) return { label: 'Excellent', color: '#22c55e' };
+				if (ms < 350) return { label: 'Good', color: '#3b82f6' };
+				if (ms < 500) return { label: 'Average', color: '#eab308' };
+				return { label: 'Keep trying', color: '#ef4444' };
+			};
+
+			const renderHistory = () => {
+				if (results.length === 0) { historyEl.innerHTML = ''; return; }
+				const max = Math.max(...results);
+				historyEl.innerHTML = results
+					.slice(-8)
+					.map((ms) => {
+						const { color } = rating(ms);
+						const heightPct = Math.max(10, (ms / max) * 100);
+						return `<div class="history-bar" style="height:${heightPct}%;background:${color}" title="${ms}ms"></div>`;
+					})
+					.join('');
+			};
+
+			const reset = () => {
+				circle.style.background = '#1e1e1e';
+				circle.style.boxShadow = 'none';
+				circle.classList.remove('active');
+				circleLabel.textContent = 'double tap\nto start';
+				circleLabel.style.display = '';
+				stateText.textContent = '';
+				reactionTimeEl.textContent = '';
+				reactionLabelEl.textContent = '';
+				tiller.setLedOff();
+			};
+
+			const startRound = () => {
+				if (phase === 'countdown' || phase === 'active') return;
+				phase = 'countdown';
+				circle.style.background = '#1e1e1e';
+				circle.style.boxShadow = 'none';
+				circle.classList.remove('active');
+				circleLabel.style.display = 'none';
+				stateText.textContent = 'Get ready…';
+				reactionTimeEl.textContent = '';
+				reactionLabelEl.textContent = '';
+				tiller.setLedOff();
+
+				const delay = 1500 + Math.random() * 2500;
+				countdownTimer = setTimeout(showColor, delay);
+			};
+
+			const showColor = () => {
+				currentColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+				phase = 'active';
+				showTime = Date.now();
+
+				circle.style.background = currentColor.hex;
+				circle.style.boxShadow = `0 0 60px ${currentColor.hex}55`;
+				circle.classList.add('active');
+				stateText.textContent = 'Tap!';
+
+				tiller.setLedColor(currentColor.r, currentColor.g, currentColor.b);
+			};
+
+			tiller
+				.on('doubletap', () => {
+					if (phase === 'idle' || phase === 'result') startRound();
+				})
+				.on('press', () => {
+					if (phase === 'countdown') {
+						clearTimeout(countdownTimer);
+						phase = 'idle';
+						falseStartEl.classList.add('show');
+						circle.style.background = '#2a1010';
+						stateText.textContent = '';
+						tiller.setLedOff();
+						setTimeout(() => {
+							falseStartEl.classList.remove('show');
+							reset();
+						}, 1200);
+					} else if (phase === 'active') {
+						const ms = Date.now() - showTime;
+						results.push(ms);
+						phase = 'result';
+
+						circle.style.background = '#1e1e1e';
+						circle.style.boxShadow = 'none';
+						circle.classList.remove('active');
+						circleLabel.style.display = '';
+						circleLabel.textContent = 'double tap\nto play again';
+						stateText.textContent = '';
+						tiller.setLedOff();
+
+						const { label, color } = rating(ms);
+						reactionTimeEl.textContent = `${ms}ms`;
+						reactionTimeEl.style.color = color;
+						reactionLabelEl.textContent = label;
+						reactionLabelEl.style.color = color;
+
+						renderHistory();
+					}
+				})
+				.on('longpress', () => {
+					clearTimeout(countdownTimer);
+					phase = 'idle';
+					results = [];
+					renderHistory();
+					reset();
+					circleLabel.textContent = 'double tap\nto start';
+				});
+
+			document.getElementById('connect-btn').onclick = async () => {
+				await tiller.connect();
+				document.getElementById('connect-screen').style.display = 'none';
+				document.getElementById('game-screen').style.display = 'flex';
+			};
+		</script>
+	</body>
+</html>

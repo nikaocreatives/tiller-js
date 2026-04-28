@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tiller Demo</title>
+		<style>
+			body {
+				margin: 0px;
+				font-family: monospace;
+			}
+			#myDIV {
+				height: 100vh;
+				width: 100%;
+				overflow: auto;
+			}
+			#content {
+				height: 4000px;
+				width: 100%;
+				background-color: coral;
+				padding: 16px;
+				box-sizing: border-box;
+			}
+			#log {
+				margin-top: 16px;
+				font-size: 13px;
+			}
+			#log div {
+				padding: 2px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="myDIV">
+			<div id="content">
+				<button id="connectButton">connect device</button>
+				<div id="log"></div>
+			</div>
+		</div>
+		<script type="module">
+			import { Tiller } from '../src/index.js';
+
+			const tiller = new Tiller({ scrollSensitivity: 10 });
+
+			const log = (msg) => {
+				const el = document.createElement('div');
+				el.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
+				document.getElementById('log').prepend(el);
+			};
+
+			connectButton.onclick = async () => {
+				await tiller.connect();
+				connectButton.style.display = 'none';
+				log('connected');
+
+				tiller
+					.on('connect', () => log('reconnected'))
+					.on('disconnect', () => log('disconnected'))
+					.on('press', () => log('press'))
+					.on('release', () => log('release'))
+					.on('tap', () => {
+						log('tap — toggling LED');
+						tiller.toggleLed();
+					})
+					.on('doubletap', () => {
+						log('double tap — red');
+						tiller.setLedColor(255, 0, 0);
+					})
+					.on('longpress', () => {
+						log('long press — blue');
+						tiller.setLedColor(0, 0, 255);
+					})
+					.on('scroll', (delta) => {
+						log(`scroll ${delta}`);
+						// const div = document.getElementById('myDIV');
+						// div.scrollTop = Math.max(0, div.scrollTop + delta);
+					});
+			};
+		</script>
+	</body>
+</html>
