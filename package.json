@@ -4,6 +4,9 @@
 	"description": "JavaScript library for the Tiller time tracker — gestures and LED control via WebHID",
 	"type": "module",
 	"main": "src/index.js",
+	"files": [
+		"src"
+	],
 	"exports": {
 		".": "./src/index.js"
 	},
@@ -19,7 +22,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/nikaocreatives/tiller-js.git"
+		"url": "git+https://github.com/nikaocreatives/tiller-js.git"
 	},
 	"homepage": "https://github.com/nikaocreatives/tiller-js#readme",
 	"bugs": {

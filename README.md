@@ -1,6 +1,6 @@
 # Tiller.js
 
-<!-- [![npm version](https://img.shields.io/npm/v/tiller-js)](https://www.npmjs.com/package/tiller-js) -->
+[![npm version](https://img.shields.io/npm/v/tiller-js)](https://www.npmjs.com/package/tiller-js)
 
 [![license](https://img.shields.io/github/license/nikaocreatives/tiller-js)](LICENSE)
 [![WebHID](https://img.shields.io/badge/WebHID-Chrome%20%7C%20Edge-blue)](https://caniuse.com/webhid)
