@@ -10,6 +10,8 @@ A JavaScript library for the [Tiller](https://gettiller.com) time tracker — co
 
 - A browser with [WebHID](https://caniuse.com/webhid) support (Chrome, Edge)
 - A Tiller device
+  <img src="/public/tiller-device-silver.png" width="200" height="auto">
+  ![Photo of Tiller device](/public/tiller-device-silver.png)
 
 ## Installation
 
@@ -21,11 +23,11 @@ import { Tiller } from './src/index.js';
 
 ## Demos
 
-|     | Demo                                     | Description                                               |
-| --- | ---------------------------------------- | --------------------------------------------------------- |
-| ⏱   | [Stopwatch](demo/stopwatch.html)         | Tap to start/stop, double tap to lap, long press to reset |
-| 🎨  | [Color Mixer](demo/color-mixer.html)     | Scroll through hues, LED matches live, tap to save colors |
-| ⚡  | [Reaction Game](demo/reaction-game.html) | React to the LED color as fast as possible                |
+|     | Demo                                          | Description                                               |
+| --- | --------------------------------------------- | --------------------------------------------------------- |
+| ⏱   | [Stopwatch](docs/demo/stopwatch.html)         | Tap to start/stop, double tap to lap, long press to reset |
+| 🎨  | [Color Mixer](docs/demo/color-mixer.html)     | Scroll through hues, LED matches live, tap to save colors |
+| ⚡  | [Reaction Game](docs/demo/reaction-game.html) | React to the LED color as fast as possible                |
 
 ## Quick Start
 

@@ -5,7 +5,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Tiller.js</title>
 		<style>
-			*, *::before, *::after { box-sizing: border-box; }
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
 
 			:root {
 				--bg: #fff;
@@ -23,12 +27,17 @@
 				margin: 0;
 				background: var(--bg);
 				color: var(--fg);
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 				line-height: 1.6;
 			}
 
-			a { color: var(--accent); text-decoration: none; }
-			a:hover { text-decoration: underline; }
+			a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
 
 			header {
 				border-bottom: 1px solid var(--border);
@@ -58,7 +67,10 @@
 				font-size: 0.95rem;
 			}
 
-			header a.cta:hover { text-decoration: none; opacity: 0.9; }
+			header a.cta:hover {
+				text-decoration: none;
+				opacity: 0.9;
+			}
 
 			main {
 				max-width: 760px;
@@ -82,10 +94,12 @@
 				font-weight: 600;
 			}
 
-			p { margin: 0 0 16px; }
+			p {
+				margin: 0 0 16px;
+			}
 
 			code {
-				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-family: 'SF Mono', Menlo, Monaco, Consolas, monospace;
 				font-size: 0.875em;
 				background: var(--code-bg);
 				color: var(--code-fg);
@@ -117,15 +131,20 @@
 				font-size: 0.9rem;
 			}
 
-			thead tr { background: var(--table-head); }
+			thead tr {
+				background: var(--table-head);
+			}
 
-			th, td {
+			th,
+			td {
 				text-align: left;
 				padding: 10px 14px;
 				border: 1px solid var(--border);
 			}
 
-			th { font-weight: 600; }
+			th {
+				font-weight: 600;
+			}
 
 			.note {
 				background: #fff8f6;
@@ -137,7 +156,9 @@
 				color: var(--muted);
 			}
 
-			.note strong { color: var(--fg); }
+			.note strong {
+				color: var(--fg);
+			}
 
 			.badge {
 				display: inline-block;
@@ -146,7 +167,7 @@
 				border-radius: 4px;
 				padding: 2px 8px;
 				font-size: 0.8rem;
-				font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+				font-family: 'SF Mono', Menlo, Monaco, Consolas, monospace;
 				margin-right: 4px;
 			}
 
@@ -164,12 +185,14 @@
 				border-radius: 10px;
 				text-decoration: none;
 				color: var(--fg);
-				transition: border-color 0.15s, box-shadow 0.15s;
+				transition:
+					border-color 0.15s,
+					box-shadow 0.15s;
 			}
 
 			.demo-card:hover {
 				border-color: var(--accent);
-				box-shadow: 0 2px 12px rgba(232,67,26,0.08);
+				box-shadow: 0 2px 12px rgba(232, 67, 26, 0.08);
 				text-decoration: none;
 			}
 
@@ -202,7 +225,10 @@
 	<body>
 		<header>
 			<h1>Tiller.js</h1>
-			<p>A JavaScript library for the <a href="https://gettiller.com" target="_blank">Tiller</a> device — gestures and LED control for the web.</p>
+			<p>
+				A JavaScript library for the <a href="https://gettiller.com" target="_blank">Tiller</a> device — gestures and
+				LED control for the web.
+			</p>
 			<a class="cta" href="https://github.com/chasturansky/tiller-js" target="_blank">View on GitHub</a>
 		</header>
 
@@ -229,20 +255,26 @@ tiller
 
 			<h2>Demos</h2>
 			<div class="demo-grid">
-				<a class="demo-card" href="../demo/stopwatch.html">
+				<a class="demo-card" href="demo/stopwatch.html">
 					<div class="demo-card-icon">⏱</div>
 					<div class="demo-card-title">Stopwatch</div>
-					<div class="demo-card-desc">Tap to start/stop, double tap to lap, long press to reset. LED reflects running state.</div>
+					<div class="demo-card-desc">
+						Tap to start/stop, double tap to lap, long press to reset. LED reflects running state.
+					</div>
 				</a>
-				<a class="demo-card" href="../demo/color-mixer.html">
+				<a class="demo-card" href="demo/color-mixer.html">
 					<div class="demo-card-icon">🎨</div>
 					<div class="demo-card-title">Color Mixer</div>
-					<div class="demo-card-desc">Scroll to sweep through hues. LED matches live. Tap to save colors to a palette.</div>
+					<div class="demo-card-desc">
+						Scroll to sweep through hues. LED matches live. Tap to save colors to a palette.
+					</div>
 				</a>
-				<a class="demo-card" href="../demo/reaction-game.html">
+				<a class="demo-card" href="demo/reaction-game.html">
 					<div class="demo-card-icon">⚡</div>
 					<div class="demo-card-title">Reaction Game</div>
-					<div class="demo-card-desc">Double tap to start. React to the LED color as fast as possible. Track your best times.</div>
+					<div class="demo-card-desc">
+						Double tap to start. React to the LED color as fast as possible. Track your best times.
+					</div>
 				</a>
 			</div>
 
@@ -309,8 +341,10 @@ tiller
 			</table>
 
 			<div class="note">
-				<strong>Tap vs double tap:</strong> A double tap suppresses the two individual tap events — only <code>doubletap</code> fires.<br><br>
-				<strong>Long press vs tap:</strong> Releasing after a long press only fires <code>release</code> — <code>tap</code> is suppressed.
+				<strong>Tap vs double tap:</strong> A double tap suppresses the two individual tap events — only
+				<code>doubletap</code> fires.<br /><br />
+				<strong>Long press vs tap:</strong> Releasing after a long press only fires <code>release</code> —
+				<code>tap</code> is suppressed.
 			</div>
 
 			<h2>LED Control</h2>
@@ -348,8 +382,6 @@ tiller
   .on('scroll', (delta) => window.scrollBy(0, delta));</code></pre>
 		</main>
 
-		<footer>
-			Tiller.js — built for the <a href="https://gettiller.com" target="_blank">Tiller</a> device
-		</footer>
+		<footer>Tiller.js — built for the <a href="https://gettiller.com" target="_blank">Tiller</a> device</footer>
 	</body>
 </html>
