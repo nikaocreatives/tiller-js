@@ -48,34 +48,35 @@
 				document.getElementById('log').prepend(el);
 			};
 
-			connectButton.onclick = async () => {
-				await tiller.connect();
-				connectButton.style.display = 'none';
-				log('connected');
+			tiller
+				.on('connect', () => {
+					connectButton.style.display = 'none';
+					log('connected');
+				})
+				.on('disconnect', () => log('disconnected'))
+				.on('press', () => log('press'))
+				.on('release', () => log('release'))
+				.on('tap', () => {
+					log('tap — toggling LED');
+					tiller.toggleLed();
+				})
+				.on('doubletap', () => {
+					log('double tap — red');
+					tiller.setLedColor(255, 0, 0);
+				})
+				.on('longpress', () => {
+					log('long press — blue');
+					tiller.setLedColor(0, 0, 255);
+				})
+				.on('scroll', (delta) => {
+					log(`scroll ${delta}`);
+					// const div = document.getElementById('myDIV');
+					// div.scrollTop = Math.max(0, div.scrollTop + delta);
+				});
 
-				tiller
-					.on('connect', () => log('reconnected'))
-					.on('disconnect', () => log('disconnected'))
-					.on('press', () => log('press'))
-					.on('release', () => log('release'))
-					.on('tap', () => {
-						log('tap — toggling LED');
-						tiller.toggleLed();
-					})
-					.on('doubletap', () => {
-						log('double tap — red');
-						tiller.setLedColor(255, 0, 0);
-					})
-					.on('longpress', () => {
-						log('long press — blue');
-						tiller.setLedColor(0, 0, 255);
-					})
-					.on('scroll', (delta) => {
-						log(`scroll ${delta}`);
-						// const div = document.getElementById('myDIV');
-						// div.scrollTop = Math.max(0, div.scrollTop + delta);
-					});
-			};
+			connectButton.onclick = () => tiller.connect();
+
+			tiller.autoConnect();
 		</script>
 	</body>
 </html>

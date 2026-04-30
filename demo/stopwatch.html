@@ -287,11 +287,14 @@
 					tiller.setLedOff();
 				});
 
-			document.getElementById('connect-btn').onclick = async () => {
-				await tiller.connect();
+			tiller.on('connect', () => {
 				connectScreen.style.display = 'none';
 				timerScreen.style.display = 'flex';
-			};
+			});
+
+			document.getElementById('connect-btn').onclick = () => tiller.connect();
+
+			tiller.autoConnect();
 		</script>
 	</body>
 </html>

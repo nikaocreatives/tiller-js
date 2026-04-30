@@ -14,6 +14,7 @@ export class Tiller extends EventTarget {
 	#scrollSensitivity;
 	#doubleTapThreshold;
 	#longPressThreshold;
+	#listenersSetup = false;
 
 	constructor({ scrollSensitivity = 1, doubleTapThreshold = 300, longPressThreshold = 500 } = {}) {
 		super();
@@ -41,6 +42,19 @@ export class Tiller extends EventTarget {
 
 		this.#setupInputListener();
 		this.#setupConnectionListeners();
+		this.#emit('connect');
+	}
+
+	async autoConnect() {
+		if (!('hid' in navigator)) return;
+		this.#setupConnectionListeners();
+		const paired = await navigator.hid.getDevices();
+		const device = paired.find((d) => d.vendorId === VENDOR_ID && d.productId === PRODUCT_ID);
+		if (!device) return;
+		this.#device = device;
+		if (!device.opened) await device.open();
+		this.#setupInputListener();
+		this.#emit('connect');
 	}
 
 	#setupInputListener() {
@@ -88,6 +102,8 @@ export class Tiller extends EventTarget {
 	}
 
 	#setupConnectionListeners() {
+		if (this.#listenersSetup) return;
+		this.#listenersSetup = true;
 		navigator.hid.addEventListener('disconnect', ({ device }) => {
 			if (device === this.#device) {
 				this.#device = null;

@@ -246,12 +246,45 @@
 
 			<h2>Quick Start</h2>
 			<pre><code>const tiller = new Tiller();
-await tiller.connect();
 
 tiller
+  .on('connect', () => console.log('ready'))
   .on('tap', () => tiller.toggleLed())
-  .on('scroll', (delta) => window.scrollBy(0, delta));</code></pre>
-			<p><code>connect()</code> uses a previously paired device if one exists, or prompts the user to select one.</p>
+  .on('scroll', (delta) => window.scrollBy(0, delta));
+
+// Auto-connects if device was previously paired — no user gesture needed
+tiller.autoConnect();
+
+// Keep a button as fallback for first-time pairing
+document.getElementById('connect-btn').onclick = () => tiller.connect();</code></pre>
+
+			<h2>Connection</h2>
+			<p>There are two ways to connect:</p>
+			<table>
+				<thead>
+					<tr>
+						<th>Method</th>
+						<th>User gesture?</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><code>autoConnect()</code></td>
+						<td>No</td>
+						<td>Silently connects if the device has been paired before. Also listens for the device to be plugged in after page load. Emits <code>connect</code> when ready.</td>
+					</tr>
+					<tr>
+						<td><code>connect()</code></td>
+						<td>Yes</td>
+						<td>Uses a previously paired device if available; otherwise shows the browser device picker. Emits <code>connect</code> when ready.</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>The <code>connect</code> event fires in all three cases: <code>autoConnect()</code> finds a paired device on page load, a paired device is plugged in after page load, or <code>connect()</code> completes. Register <code>on('connect', ...)</code> once and it handles all three.</p>
+			<div class="note">
+				<strong>First-time pairing</strong> always requires a user gesture — the browser will not show a device picker without one. Call <code>connect()</code> from a button click handler the first time, then <code>autoConnect()</code> handles every subsequent visit automatically.
+			</div>
 
 			<h2>Demos</h2>
 			<div class="demo-grid">
@@ -371,15 +404,23 @@ tiller.ledColor    // { r, g, b } — last set color</code></pre>
 			<pre><code>import { Tiller } from './src/index.js';
 
 const tiller = new Tiller({ scrollSensitivity: 10 });
-await tiller.connect();
 
 tiller
-  .on('connect', () => console.log('Tiller connected'))
+  .on('connect', () => {
+    document.getElementById('connect-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+  })
   .on('disconnect', () => console.log('Tiller disconnected'))
   .on('tap', () => tiller.toggleLed())
   .on('doubletap', () => tiller.setLedColor(255, 0, 0))
   .on('longpress', () => tiller.setLedColor(0, 0, 255))
-  .on('scroll', (delta) => window.scrollBy(0, delta));</code></pre>
+  .on('scroll', (delta) => window.scrollBy(0, delta));
+
+// Auto-connects on page load if previously paired
+tiller.autoConnect();
+
+// Fallback button for first-time pairing
+document.getElementById('connect-btn').onclick = () => tiller.connect();</code></pre>
 		</main>
 
 		<footer>Tiller.js — built for the <a href="https://gettiller.com" target="_blank">Tiller</a> device</footer>

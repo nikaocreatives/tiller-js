@@ -339,11 +339,14 @@
 					circleLabel.textContent = 'double tap\nto start';
 				});
 
-			document.getElementById('connect-btn').onclick = async () => {
-				await tiller.connect();
+			tiller.on('connect', () => {
 				document.getElementById('connect-screen').style.display = 'none';
 				document.getElementById('game-screen').style.display = 'flex';
-			};
+			});
+
+			document.getElementById('connect-btn').onclick = () => tiller.connect();
+
+			tiller.autoConnect();
 		</script>
 	</body>
 </html>

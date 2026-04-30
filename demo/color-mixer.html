@@ -269,12 +269,15 @@
 					renderPalette();
 				});
 
-			document.getElementById('connect-btn').onclick = async () => {
-				await tiller.connect();
+			tiller.on('connect', () => {
 				document.getElementById('connect-screen').style.display = 'none';
 				document.getElementById('mixer-screen').style.display = 'flex';
 				update();
-			};
+			});
+
+			document.getElementById('connect-btn').onclick = () => tiller.connect();
+
+			tiller.autoConnect();
 		</script>
 	</body>
 </html>
