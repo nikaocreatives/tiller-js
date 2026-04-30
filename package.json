@@ -1,6 +1,6 @@
 {
 	"name": "tiller-js",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "JavaScript library for the Tiller time tracker — gestures and LED control via WebHID",
 	"type": "module",
 	"main": "src/index.js",
